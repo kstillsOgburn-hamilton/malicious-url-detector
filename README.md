@@ -1,3 +1,6 @@
+## Malicious Url Detection Deep Learning Model##
+Bi-LSTM and Bi-GRU model designed to detect malicious (malware, phishing, or defacement) or benign urls
+
 ### step 1. install dependencies
 ```bash
 pip install -r requirements.txt
