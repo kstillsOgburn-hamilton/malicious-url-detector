@@ -176,7 +176,7 @@ class URLBiRNN(L.LightningModule):
             optimizer = torch.optim.AdamW(
                 self.parameters(),
                 lr=self.hparams.lr,
-                weight_decay=0.01,
+                weight_decay=0.05,
             )
             # Access the max_epochs from the trainer
             # Use a fallback (e.g., 10) in case self.trainer is not available
