@@ -45,7 +45,7 @@ model = load_model('checkpoints/lstm_birnn/lstm_birnn-epoch=05-val_f1=0.9001.ckp
 
 # access the checkpoint from the gru_birnn after training a bi-gru model
 tokenizer, tok_type = load_tokenizer('checkpoints/gru_birnn/gru_birnn_tokenizer.pt')
-model = load_model('checkpoints/gru_birnn/gru_birnn-epoch=09-val_f1=0.8968.ckpt',
+model = load_model('checkpoints/gru_birnn/gru_birnn-epoch=02-val_f1=0.8968.ckpt',
                    model_type='birnn')
 
 
@@ -79,8 +79,8 @@ predictions = predict_batch(urls, model, tokenizer, batch_size=64)
 #### cmdline args to run inference.py
 ```bash
 python inference.py \
-  --checkpoint checkpoints/lstm_birnn/lstm_birnn-epoch=05-val_f1=0.9001.ckpt \
-  --tokenizer checkpoints/lstm_birnn/lstm_birnn_tokenizer.pt \
+  --checkpoint checkpoints/gru_birnn/gru_birnn-epoch=02-val_f1=0.8968.ckpt \
+  --tokenizer checkpoints/gru_birnn/gru_birnn_tokenizer.pt \
   --model_type birnn \
   --urls "example.com" "google.com" \
   --confidence
