@@ -1,4 +1,4 @@
 # Ignore local model artifacts
 gru_birnn/*.ckpt
 gru_birnn/*.pt
-!gru_birnn/gru_birnn-epoch=02-val_f1=0.8968.ckpt  
+!gru_birnn/gru_birnn-epoch=02-val_f1=0.8942.ckpt  
