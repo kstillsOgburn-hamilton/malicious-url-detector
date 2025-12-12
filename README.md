@@ -52,7 +52,7 @@ model = load_model('checkpoints/gru_birnn/gru_birnn-epoch=02-val_f1=0.8968.ckpt'
 
 
 
-## steps to run the best model thus far (the pre-trained model)  🛑 only run this code if you're not trained the model; othwerise use step 5.
+## steps to run the best model thus far (the pre-trained model)  🛑 only run this code if you've not trained the model; othwerise use step 5.
 ### step 1. install dependencies
 ```bash
 pip install -r requirements.txt
