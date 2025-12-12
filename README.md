@@ -136,7 +136,9 @@ python inference.py \
   --confidence
 ```
 
-#### cmdline args to run inference.py (if you're using the pre-trained model) 🛑 this will crash if you use it after running train.py; you need to access gru_birnn or lstm_birnn from the checkpoints folder created by train.py
+#### cmdline args to run inference.py (if you're using the pre-trained model) 
+#### 🛑 only works after running train.py; otherwise
+#### you need to access gru_birnn or lstm_birnn from the checkpoints folder created by train.py
 ```bash
 python inference.py \
   --checkpoint gru_birnn/gru_birnn-epoch=10-val_f1=0.8942.ckpt \
