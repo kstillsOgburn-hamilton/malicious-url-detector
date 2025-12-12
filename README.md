@@ -1,6 +1,7 @@
 ## Malicious Url Detection Deep Learning Model
 Bi-LSTM and Bi-GRU model designed to detect malicious (malware, phishing, or defacement) or benign urls
 
+## steps to train the model
 ### step 1. install dependencies
 ```bash
 pip install -r requirements.txt
@@ -33,8 +34,7 @@ python train.py \
   --dropout 0.3
 ```
 
-### step 5. python to import and run parts of inference.py OR cmdline args to run inference.py
-#### single url prediction
+### step 5. import load_model, load_tokenizer, and predict from inference.py 
 ```python
 from inference import load_model, load_tokenizer, predict
 
@@ -47,9 +47,36 @@ model = load_model('checkpoints/lstm_birnn/lstm_birnn-epoch=05-val_f1=0.9001.ckp
 tokenizer, tok_type = load_tokenizer('checkpoints/gru_birnn/gru_birnn_tokenizer.pt')
 model = load_model('checkpoints/gru_birnn/gru_birnn-epoch=02-val_f1=0.8968.ckpt',
                    model_type='birnn')
+```
 
 
-# simple prediction
+
+
+## steps to run the best model thus far (the pre-trained model)  🛑 only run this code if you're not trained the model; othwerise use step 5.
+### step 1. install dependencies
+```bash
+pip install -r requirements.txt
+```
+
+### step 2. import load_model, load_tokenizer, and predict from inference.py
+```python
+from inference import load_model, load_tokenizer, predict
+
+# The checkpoints were extracted directly into 'lstm_birnn' folder
+tokenizer, _ = load_tokenizer('lstm_birnn/lstm_birnn_tokenizer.pt')
+model = load_model('lstm_birnn/lstm_birnn-epoch=05-val_f1=0.9001.ckpt', 
+                   model_type='birnn')
+
+# The checkpoints were extracted directly into 'gru_birnn' folder
+tokenizer, tok_type = load_tokenizer('gru_birnn/gru_birnn_tokenizer.pt')
+model = load_model('gru_birnn/gru_birnn-epoch=10-val_f1=0.8942.ckpt',
+                   model_type='birnn')               
+```
+
+
+## python for using specific prediction defintions founds in inference.py
+#### simple prediction
+```python
 prediction = predict("example.com", model, tokenizer)
 print(prediction)  # Output: "Benign"
 
@@ -74,13 +101,26 @@ from inference import predict_batch
 
 urls = [...]  # Large list of URLs
 predictions = predict_batch(urls, model, tokenizer, batch_size=64)
+view = zip(predictions, urls)
+print(list(view))
 ```
 
-#### cmdline args to run inference.py
+## Running inference.py
+#### cmdline args to run inference.py (if you've trained the model)
 ```bash
 python inference.py \
   --checkpoint checkpoints/gru_birnn/gru_birnn-epoch=02-val_f1=0.8968.ckpt \
   --tokenizer checkpoints/gru_birnn/gru_birnn_tokenizer.pt \
+  --model_type birnn \
+  --urls "example.com" "google.com" \
+  --confidence
+```
+
+#### cmdline args to run inference.py (if you're using the pre-trained model)
+```bash
+python inference.py \
+  --checkpoint gru_birnn/gru_birnn-epoch=10-val_f1=0.8942.ckpt \
+  --tokenizer gru_birnn/gru_birnn_tokenizer.pt \
   --model_type birnn \
   --urls "example.com" "google.com" \
   --confidence
