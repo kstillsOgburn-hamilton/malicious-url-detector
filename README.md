@@ -89,7 +89,9 @@ print(f"Created zip at: {os.path.abspath(zip_path)}")
 ```
 
 
-### steps to run the trained model 🛑 only run this code if you want to use the trained the model; othwerise run code in step 5 to run the model immediately after training it.
+## steps to run the trained model 
+## 🛑 only run this code if you want to use the trained model; othwerise run code in step 5 to run the model that you've just trained.
+
 ### step 1. install dependencies
 ```bash
 pip install -r requirements.txt
