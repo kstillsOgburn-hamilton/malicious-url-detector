@@ -122,6 +122,10 @@ def load_model(checkpoint_path, model_type, device=None):
 #               PREPROCESS SINGLE URL
 # -------------------------------------------------------
 def preprocess(url, tokenizer, max_len=256):
+    """
+    Tokenize + truncate + pad a single URL.
+    Assumes tokenizer.encode() already prepends <cls>
+    """
     import re
 
     url = url.lower().strip()
