@@ -95,19 +95,24 @@ model = load_model('gru_birnn/gru_birnn-epoch=10-val_f1=0.8942.ckpt',
 
 
 ## python for using specific prediction defintions found in inference.py
-#### simple prediction
+
+#### single url prediction
 ```python
-prediction = predict("example.com", model, tokenizer)
+url = "hamilton.edu" # sample url
+prediction = predict(url, model, tokenizer)
 print(prediction)  # Output: "Benign"
 
 # with confidence scores
-label, confidence, probs = predict("example.com", model, tokenizer, return_confidence=True)
-print(f"Label: {label}")
+label, confidence, probs = predict(url, model, tokenizer, return_confidence=True)
+print(f"URL: {url}")
+print(f"Prediction: {label}")
 print(f"Confidence: {confidence:.2%}")
-print(f"Probabilities: {probs}")
+print(f"All probabilities:")
+for class_name, prob in sorted(probs.items(), key=lambda x: x[1], reverse=True):
+    print(f"  {class_name}: {prob:.2%}")
 ```
 
-#### url batch prediction
+#### small url batch prediction
 ```python
 urls = ["google.com", "example.com", "suspicious-site.com"]
 predictions = predict(urls, model, tokenizer)
@@ -115,14 +120,28 @@ for url, pred in zip(urls, predictions):
     print(f"{url}: {pred}")
 ```
 
-#### large url batch inference
+#### large url batch inference (1)
 ```python
 from inference import predict_batch
 
 urls = [...]  # Large list of URLs
 predictions = predict_batch(urls, model, tokenizer, batch_size=64)
 view = zip(predictions, urls)
-print(list(view))
+for pred, url in view:
+    print(f"('{pred}', '{url}')")
+```
+
+#### large url batch inference (2)
+```python
+for url in urls:
+    label, confidence, probs = predict(url, model, tokenizer, return_confidence=True)
+    print(f"URL: {url}")
+    print(f"  Prediction: {label}")
+    print(f"  Confidence: {confidence:.2%}")
+    print("  All probabilities:")
+    for class_name, prob in sorted(probs.items(), key=lambda x: x[1], reverse=True):
+        print(f"  {class_name}: {prob:.2%}")
+    print("------------------------------")
 ```
 
 ## Running inference.py
