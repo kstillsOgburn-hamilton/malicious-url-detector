@@ -121,19 +121,37 @@ def load_model(checkpoint_path, model_type, device=None):
 # -------------------------------------------------------
 #               PREPROCESS SINGLE URL
 # -------------------------------------------------------
+# def preprocess(url, tokenizer, max_len=256):
+#     """
+#     Tokenize + truncate + pad a single URL.
+#     Assumes tokenizer.encode() already prepends <cls>
+#     """
+#     import re
+#     url_cleaned = re.sub(r"^(http://|https://)", "", url, count=1)
+#     ids = tokenizer.encode(url_cleaned)
+
+#     ids = ids[:max_len]
+#     pad_len = max_len - len(ids)
+
+#     ids = F.pad(
+#         torch.tensor(ids, dtype=torch.long),
+#         (0, pad_len),
+#         value=tokenizer.pad_id,
+#     )
+
+#     return ids.unsqueeze(0)  # shape: (1, max_len)
 def preprocess(url, tokenizer, max_len=256):
-    """
-    Tokenize + truncate + pad a single URL.
-    Assumes tokenizer.encode() already prepends <cls>
-    """
     import re
+    
+    # normalize like data_acquisition.py
+    url_cleaned = (url or "").lower().strip()
+    url_cleaned = re.sub(r'^(https?://)', '', url_cleaned)
+    url_cleaned = re.sub(r'^(www\.)', '', url_cleaned)
+    url_cleaned = re.sub(r'/$', '', url_cleaned)
 
-    url = url.lower().strip()
-    url = re.sub(r'^(https?://)', '', url)
-    url = re.sub(r'^(www\.)', '', url)
-    url = re.sub(r'/$', '', url)
+    ids = tokenizer.encode(url_cleaned)  # assumes encode prepends <cls>
 
-    ids = tokenizer.encode(url)
+    # truncate then pad
     ids = ids[:max_len]
     pad_len = max_len - len(ids)
 
@@ -142,8 +160,7 @@ def preprocess(url, tokenizer, max_len=256):
         (0, pad_len),
         value=tokenizer.pad_id,
     )
-
-    return ids.unsqueeze(0)
+    return ids.unsqueeze(0)  # (1, max_len)
 
 
 # -------------------------------------------------------

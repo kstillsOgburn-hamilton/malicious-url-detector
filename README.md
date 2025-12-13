@@ -23,6 +23,8 @@ train the model with the following cmd...
 1. choose char or word for tokenizer_type
 2. choose lstm or gru for rnn_type
 ```bash
+
+BASIC OPTION
 python train.py \
   --data_path final_dataset.csv \
   --tokenizer_type char \
@@ -32,6 +34,21 @@ python train.py \
   --epochs 50 \
   --lr 1e-3 \
   --dropout 0.3
+
+
+COMPREHENSIVE OPTION
+python train.py \
+  --data_path final_dataset.csv \ 
+  --tokenizer_type word \ 
+  --rnn_type gru \ 
+  --embed_dim 128 \ 
+  --hidden_dim 256 \ 
+  --num_rnn_layers 2 \ 
+  --dropout 0.3 \ 
+  --batch_size 64 \ 
+  --max_len 256 \ 
+  --epochs 50 \ 
+  --lr 1e-3.0
 ```
 
 ### step 5. import load_model, load_tokenizer, and predict from inference.py 
@@ -72,7 +89,9 @@ print(f"Created zip at: {os.path.abspath(zip_path)}")
 ```
 
 
-## steps to run the best model thus far (the pre-trained model)  🛑 only run this code if you've not trained the model; othwerise use step 5.
+## steps to run the best model thus far (the trained model)  
+## 🛑 only run this code if you want to use the trained the model; othwerise run
+## code in step 5 to run the model immediately after training it.
 ### step 1. install dependencies
 ```bash
 pip install -r requirements.txt
@@ -114,7 +133,7 @@ for class_name, prob in sorted(probs.items(), key=lambda x: x[1], reverse=True):
 
 #### small url batch prediction
 ```python
-urls = ["google.com", "example.com", "suspicious-site.com"]
+urls = ["hamilton.edu", "www.hamilton.edu", "https://www.hamilton.edu/",]
 predictions = predict(urls, model, tokenizer)
 for url, pred in zip(urls, predictions):
     print(f"{url}: {pred}")
@@ -145,7 +164,7 @@ for url in urls:
 ```
 
 ## Running inference.py
-#### cmdline args to run inference.py (if you've trained the model)
+#### cmdline args to run inference.py AFTER training model
 ```bash
 python inference.py \
   --checkpoint checkpoints/gru_birnn/gru_birnn-epoch=02-val_f1=0.8968.ckpt \
@@ -155,15 +174,15 @@ python inference.py \
   --confidence
 ```
 
-#### cmdline args to run inference.py (if you're using the pre-trained model) 
-#### 🛑 only works after running train.py; otherwise
-#### you need to access gru_birnn or lstm_birnn from the checkpoints folder created by train.py
+#### cmdline args to run inference.py on the TRAINED model 
+#### 🛑 you need to access gru_birnn or lstm_birnn from the checkpoints 
+#### folder created by train.py
 ```bash
 python inference.py \
   --checkpoint gru_birnn/gru_birnn-epoch=10-val_f1=0.8942.ckpt \
   --tokenizer gru_birnn/gru_birnn_tokenizer.pt \
   --model_type birnn \
-  --urls "example.com" "google.com" \
+  --urls "www.hamilton.edu" "google.com" \
   --confidence
 ```
 
