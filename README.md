@@ -174,9 +174,7 @@ python inference.py \
   --confidence
 ```
 
-#### cmdline args to run inference.py on the TRAINED model 
-#### 🛑 you need to access gru_birnn or lstm_birnn from the checkpoints 
-#### folder created by train.py
+#### cmdline args to run inference.py on the TRAINED model. 🛑 You need to access gru_birnn or lstm_birnn from the checkpoints folder created by train.py (right now gru_birnn has already been downloaded from checkpoints.zip)
 ```bash
 python inference.py \
   --checkpoint gru_birnn/gru_birnn-epoch=10-val_f1=0.8942.ckpt \
