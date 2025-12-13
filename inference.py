@@ -122,14 +122,14 @@ def load_model(checkpoint_path, model_type, device=None):
 #               PREPROCESS SINGLE URL
 # -------------------------------------------------------
 def preprocess(url, tokenizer, max_len=256):
-    """
-    Tokenize + truncate + pad a single URL.
-    Assumes tokenizer.encode() already prepends <cls>
-    """
     import re
-    url_cleaned = re.sub(r"^(http://|https://)", "", url, count=1)
-    ids = tokenizer.encode(url_cleaned)
 
+    url = url.lower().strip()
+    url = re.sub(r'^(https?://)', '', url)
+    url = re.sub(r'^(www\.)', '', url)
+    url = re.sub(r'/$', '', url)
+
+    ids = tokenizer.encode(url)
     ids = ids[:max_len]
     pad_len = max_len - len(ids)
 
@@ -139,7 +139,7 @@ def preprocess(url, tokenizer, max_len=256):
         value=tokenizer.pad_id,
     )
 
-    return ids.unsqueeze(0)  # shape: (1, max_len)
+    return ids.unsqueeze(0)
 
 
 # -------------------------------------------------------

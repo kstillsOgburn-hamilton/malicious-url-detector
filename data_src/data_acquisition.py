@@ -228,13 +228,18 @@ def main():
     # A. BENIGN (Kaggle + Tranco)
     print("\nAssembling Benign Pool...")
     df_k_benign = df_k[df_k['label'] == LABEL_BENIGN].copy()
-    
-    # Logic to match Tranco count to Kaggle count
+
     tranco_sample_size = min(len(df_k_benign), len(df_t))
     df_t_sample = df_t.sample(n=tranco_sample_size, random_state=42)
-    
+
     df_benign_pool = pd.concat([df_k_benign, df_t_sample], ignore_index=True)
     print(f"  Benign Pool: {len(df_benign_pool)} URLs")
+
+    # Augment benign with www-prefixed variants
+    benign_www = df_benign_pool.copy()
+    benign_www['url'] = 'www.' + benign_www['url'].astype(str).str.replace(r'^www\.', '', regex=True)
+    df_benign_pool = pd.concat([df_benign_pool, benign_www], ignore_index=True)
+
 
     # B. MALWARE (Kaggle + URLhaus)
     print("Assembling Malware Pool...")
@@ -303,8 +308,13 @@ def main():
     
     # --- 5. Save ---
     # Add this line to clean the protocols from the final 'url' column
-    print("Removing http/https protocols from final URL list...")
-    balanced_df['url'] = balanced_df['url'].astype(str).str.replace(r"^(http://|https://)", "", regex=True)
+    print("Removing http/https protocols and leading www from final URL list...")
+    balanced_df['url'] = (
+    balanced_df['url']
+    .astype(str)
+    .str.replace(r"^(http://|https://)", "", regex=True)
+    .str.replace(r"^www\.", "", regex=True)
+)
 
     # save the cleaned dataframe
     os.makedirs(os.path.dirname(FINAL_OUTPUT_FILE) or ".", exist_ok=True)

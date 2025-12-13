@@ -128,7 +128,7 @@ urls = [...]  # Large list of URLs
 predictions = predict_batch(urls, model, tokenizer, batch_size=64)
 view = zip(predictions, urls)
 for pred, url in view:
-    print(f"('{pred}', '{url}')")
+    print(f"('{url}', '{pred}')")
 ```
 
 #### large url batch inference (2)
