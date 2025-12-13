@@ -101,12 +101,12 @@ pip install -r requirements.txt
 ```python
 from inference import load_model, load_tokenizer, predict
 
-# The checkpoints were extracted directly into 'lstm_birnn' folder
+# The checkpoints.zip was extracted directly into 'lstm_birnn' folder
 tokenizer, _ = load_tokenizer('lstm_birnn/lstm_birnn_tokenizer.pt')
 model = load_model('lstm_birnn/lstm_birnn-epoch=05-val_f1=0.9001.ckpt', 
                    model_type='birnn')
 
-# The checkpoints were extracted directly into 'gru_birnn' folder
+# The checkpoints.zip was extracted directly into 'gru_birnn' folder
 tokenizer, tok_type = load_tokenizer('gru_birnn/gru_birnn_tokenizer.pt')
 model = load_model('gru_birnn/gru_birnn-epoch=10-val_f1=0.8942.ckpt',
                    model_type='birnn')               
@@ -164,7 +164,7 @@ for url in urls:
 ```
 
 ## Running inference.py
-#### cmdline args to run inference.py AFTER training model
+#### cmdline args to run inference.py AFTER training the model
 ```bash
 python inference.py \
   --checkpoint checkpoints/gru_birnn/gru_birnn-epoch=02-val_f1=0.8968.ckpt \
@@ -185,22 +185,26 @@ python inference.py \
 ```
 
 
-
-
-
-
-
-
-
 ### model scope & examples
-- In-scope (what it was trained on): typical HTTP/HTTPS URLs that look like phishing, malware, defacement, or benign.  
-  - `https://secure-paypal-login-verification.com/auth/update` (phishing-pattern hostname)  
-  - `http://maliciousupdates.net/patches/system32_fix.exe` (malware-looking path/extension)  
-  - `https://musicreviews.co/defacement/anonymous-ops/` (defacement-looking path)  
-  - `https://example.com/profile` or `https://wikipedia.org/wiki/URL` (benign)
-- Out-of-scope / likely poor performance: IP-host URLs, non-HTTP schemes, punycode tricks, heavily encoded Unicode, or URLs where key signals sit past 256 chars.  
-  - IP host: `http://192.0.2.10/login`, `https://203.0.113.55/update.exe`  
-  - Non-HTTP scheme: `ftp://downloads.example.com/app.exe`, `data:text/html,<script>alert(1)</script>`  
-  - Punycode/IDN: `http://xn--pple-43d.com/login` (looks like “äpple.com”), `https://xn--googl-fsa.com/secure`  
-  - Encoded Unicode/obfuscation: `https://login.microsoft.com/%e2%80%ae%e2%80%ae/account`, `http://example.com/%c3%a9%2Fverify`  
-  - Overlength/obfuscated: `https://site.com/path/` followed by 300+ random chars where the malicious bits sit beyond position 256 (they’ll be truncated)
+In-scope (what it was trained on): URL strings (normalized by lowercasing and stripping http(s)://, leading www., and trailing /) that resemble benign, phishing, malware, or defacement patterns in the hostname/path.
+Examples (shown as full URLs, but normalized before tokenization):
+
+https://secure-paypal-login-verification.com/auth/update (phishing-like hostname tokens)
+
+http://maliciousupdates.net/patches/system32_fix.exe (malware-like path/extension)
+
+https://musicreviews.co/defacement/anonymous-ops/ (defacement-like path tokens)
+
+https://wikipedia.org/wiki/URL (benign-like)
+
+Out-of-scope / likely poor performance: IP-host URLs (removed during dataset cleaning), non-HTTP schemes (rare/absent in training and not stripped by normalization), IDN/punycode tricks, heavy encoding/Unicode obfuscation, and cases where key signals occur beyond 256 tokens and are truncated.
+
+IP host: http://192.0.2.10/login, https://203.0.113.55/update.exe
+
+Non-HTTP: ftp://downloads.example.com/app.exe, data:text/html,<script>…</script>
+
+Punycode/IDN: http://xn--pple-43d.com/login
+
+Encoded/obfuscated: https://login.microsoft.com/%e2%80%ae…
+
+Overlength: URLs where malicious indicators appear only after the first 256 tokens (truncated)
