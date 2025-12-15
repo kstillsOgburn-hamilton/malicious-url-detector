@@ -7,26 +7,39 @@ Bi-LSTM and Bi-GRU model designed to detect malicious (malware, phishing, or def
 pip install -r requirements.txt
 ```
 
-### step 2. set up Kaggle API (data acquisition.py needs this)
-1. Go to [Kaggle Account Settings](https://www.kaggle.com/account)
-2. Scroll to "API" section
-3. Click "Create New Token" to download `kaggle.json`
-4. Place `kaggle.json` in `~/.kaggle/` (Linux/Mac) or `C:\Users\<username>\.kaggle\` (Windows)
+### step 2. create a virtual environment
+```bash
+# Using venv
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
 
-### step 3. acquire the data
+# Or using conda
+conda create -n url_classifier python=3.10 # if 3.10 doesn't work try 3.12
+conda activate url_classifier
+```
+
+### step 3. set up Kaggle API (data acquisition.py needs this)
+1. Create a Kaggle account if you don't already have one.
+2. Go to [Kaggle Account Settings](https://www.kaggle.com/account)
+3. Scroll to "API" section
+4. Click "Create New Token" to download `kaggle.json`
+5. Place `kaggle.json` in `~/.kaggle/` (Linux/Mac) or `C:\Users\<username>\.kaggle\` (Windows)
+
+### step 4. acquire the data
 ```bash
 python data_src/data_acquisition.py
 ```
 
-### step 4. cmdline args to run train.py
+### step 5. cmdline args to run train.py
 train the model with the following cmd...
 1. choose char or word for tokenizer_type
 2. choose lstm or gru for rnn_type
+3. choose your other flavor of parameter args
 ```bash
 
 BASIC OPTION
 python train.py \
-  --data_path final_dataset.csv \
+  --data_path final_dataset.csv \ # file path to the csv file created by data_src/data_acquisition.py
   --tokenizer_type char \
   --rnn_type lstm \
   --batch_size 32 \
@@ -50,13 +63,18 @@ python train.py \
   --epochs 50 \ 
   --lr 1e-3.0
 ```
+After training, you'll find:
+- **Checkpoints**: `checkpoints/{model_name}/`
+  - Best model: `{model_name}-epoch={epoch}-val_f1={f1}.ckpt`
+  - Last model: `last.ckpt`
+- **Tokenizer**: `checkpoints/{model_name}/{model_name}_tokenizer.pt`
 
-### step 5. import load_model, load_tokenizer, and predict from inference.py 
+### step 6. import load_model, load_tokenizer, and predict from inference.py 
 ```python
 from inference import load_model, load_tokenizer, predict
 
 # access the checkpoint from the lstm_birnn after training a bi-lstm model
-tokenizer, _ = load_tokenizer('checkpoints/lstm_birnn/lstm_birnn_tokenizer.pt')  #lstm_birnn or gru_birnn is the folder produced when checkpoints.zip is unpacked
+tokenizer, _ = load_tokenizer('checkpoints/lstm_birnn/lstm_birnn_tokenizer.pt')  # lstm_birnn or gru_birnn is the folder produced when checkpoints.zip is unzipped
 model = load_model('checkpoints/lstm_birnn/lstm_birnn-epoch=05-val_f1=0.9001.ckpt', 
                    model_type='birnn')
 
@@ -66,7 +84,7 @@ model = load_model('checkpoints/gru_birnn/gru_birnn-epoch=02-val_f1=0.8968.ckpt'
                    model_type='birnn')
 ```
 
-### step 6. save the model specifications after running train.py
+### step 7. save the model specifications after running train.py
 for the google colab env
 ```python
 import shutil
@@ -80,40 +98,50 @@ files.download('checkpoints.zip')
 ```
 
 for your local/remote machine
-```python
-import shutil, os
+`
+#### After training, you'll find the model here...
+`checkpoints/{model_name}/{model_name}-epoch={epoch}-val_f1={f1}.ckpt`
+#### and the tokenizer here...
+`checkpoints/{model_name}/{model_name}_tokenizer.pt`
 
-# Zip the checkpoints folder; creates checkpoints.zip in the current directory
-zip_path = shutil.make_archive('checkpoints', 'zip', 'checkpoints')
-print(f"Created zip at: {os.path.abspath(zip_path)}")
-```
+
+
 
 
 ## steps to run the trained model 
-## 🛑 only run this code if you want to use the trained model; othwerise run code in step 5 to run the model that you've just trained.
+## 🛑 only run this code if you want to use the trained model; othwerise run code in step 6 to run the model that you've just trained.
 
 ### step 1. install dependencies
 ```bash
 pip install -r requirements.txt
 ```
+### step 2. create virtual environment
+```bash
+# Using venv
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
 
-### step 2. import load_model, load_tokenizer, and predict from inference.py
+# Or using conda
+conda create -n url_classifier python=3.10 # if 3.10 doesn't work try 3.12
+conda activate url_classifier
+```
+
+### step 3. import load_model, load_tokenizer, and predict from inference.py
 ```python
 from inference import load_model, load_tokenizer, predict
 
-# The checkpoints.zip was extracted directly into 'lstm_birnn' folder
+# Extract the checkpoints.zip file to access the 'lstm_birnn' folder directly
 tokenizer, _ = load_tokenizer('lstm_birnn/lstm_birnn_tokenizer.pt')
 model = load_model('lstm_birnn/lstm_birnn-epoch=05-val_f1=0.9001.ckpt', 
                    model_type='birnn')
 
-# The checkpoints.zip was extracted directly into 'gru_birnn' folder
+# Extract the checkpoints.zip file to access the 'gru_birnn' folder directly
 tokenizer, tok_type = load_tokenizer('gru_birnn/gru_birnn_tokenizer.pt')
 model = load_model('gru_birnn/gru_birnn-epoch=10-val_f1=0.8942.ckpt',
-                   model_type='birnn')               
+                   model_type='birnn')  
 ```
 
-
-## python for using specific prediction defintions found in inference.py
+## python code to use specific prediction defintions found in inference.py
 
 #### single url prediction
 ```python
@@ -167,17 +195,17 @@ for url in urls:
 #### cmdline args to run inference.py AFTER training the model
 ```bash
 python inference.py \
-  --checkpoint checkpoints/gru_birnn/gru_birnn-epoch=02-val_f1=0.8968.ckpt \
+  --checkpoint checkpoints/gru_birnn/gru_birnn-epoch=02-val_f1=0.8942.ckpt \ # currently using the best model
   --tokenizer checkpoints/gru_birnn/gru_birnn_tokenizer.pt \
   --model_type birnn \
-  --urls "example.com" "google.com" \
+  --urls "youtube.com" "google.com" \
   --confidence
 ```
 
 #### cmdline args to run inference.py on the TRAINED model. 🛑 You need to access gru_birnn or lstm_birnn from the checkpoints folder created by train.py (right now gru_birnn has already been downloaded from checkpoints.zip)
 ```bash
 python inference.py \
-  --checkpoint gru_birnn/gru_birnn-epoch=10-val_f1=0.8942.ckpt \
+  --checkpoint gru_birnn/gru_birnn-epoch=10-val_f1=0.8942.ckpt \ # currenlty using the best model
   --tokenizer gru_birnn/gru_birnn_tokenizer.pt \
   --model_type birnn \
   --urls "www.hamilton.edu" "google.com" \
