@@ -171,7 +171,7 @@ for url in urls:
 #### cmdline args to run inference.py AFTER training the model
 ```bash
 python inference.py \
-  --checkpoint checkpoints/gru_birnn/gru_birnn-epoch=02-val_f1=0.8942.ckpt \ # currently using the best model
+  --checkpoint checkpoints/gru_birnn/gru_birnn-epoch=02-val_f1=0.8942.ckpt \
   --tokenizer checkpoints/gru_birnn/gru_birnn_tokenizer.pt \
   --model_type birnn \
   --urls "youtube.com" "google.com" \
