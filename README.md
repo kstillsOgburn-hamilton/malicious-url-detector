@@ -109,7 +109,7 @@ for your local/remote machine
 
 
 ## steps to run the trained model 
-## 🛑 only run this code if you want to use the trained model; othwerise run code in step 6 to run the model that you've just trained.
+## 🛑 only run this code if you want to use the TRAINED model; othwerise go back to step 6 to load the latest model
 
 ### step 1. install dependencies
 ```bash
