@@ -1,12 +1,11 @@
 ## Malicious URL Detection Deep Learning Model
 Bi-LSTM and Bi-GRU model designed to detect malicious (malware, phishing, or defacement) or benign urls
 
-## steps to train the model
-### step 1. install dependencies
+## download the malicious-url-detector repo and setup environment
+### step 1. clone the repo
 ```bash
-pip install -r requirements.txt
+git clone https://github.com/kstillsOgburn-hamilton/malicious-url-detector.git
 ```
-
 ### step 2. create a virtual environment
 ```bash
 # Using venv
@@ -18,35 +17,43 @@ conda create -n url_classifier python=3.10 # if 3.10 doesn't work try 3.12
 conda activate url_classifier
 ```
 
-### step 3. set up Kaggle API (data acquisition.py needs this)
+### step 3. install dependencies
+```bash
+pip install -r requirements.txt
+```
+
+## steps to train the model
+### step 4. set up Kaggle API (data acquisition.py needs this)
 1. Create a Kaggle account if you don't already have one.
 2. Go to [Kaggle Account Settings](https://www.kaggle.com/account)
 3. Scroll to "API" section
 4. Click "Create New Token" to download `kaggle.json`
 5. Place `kaggle.json` in `~/.kaggle/` (Linux/Mac) or `C:\Users\<username>\.kaggle\` (Windows)
 
-### step 4. acquire the data
+### step 5. acquire and clean the data
 ```bash
 python data_src/data_acquisition.py
 ```
 
-### step 5. cmdline args to run train.py
+### step 6. cmdline args to run train.py
 train the model with the following cmd...
-1. choose char or word for tokenizer_type
-2. choose lstm or gru for rnn_type
-3. choose your other flavor of parameter args
+1. get the absolute path to the `final_dataset.csv`
+2. choose char or word for tokenizer_type
+3. choose lstm or gru for rnn_type
+4. choose the other hyperparameter args (i.e. batch size, etc.)
 ```bash
 
 BASIC OPTION
 python train.py \
-  --data_path final_dataset.csv \ # file path to the csv file created by data_src/data_acquisition.py
+  --data_path final_dataset.csv \ # the file path for the dataset
   --tokenizer_type char \
-  --rnn_type lstm \
+  --hidden_dim 64 \
+  --rnn_type gru \
   --batch_size 32 \
   --max_len 256 \
   --epochs 50 \
   --lr 1e-3 \
-  --dropout 0.3
+  --dropout 0.2
 
 
 COMPREHENSIVE OPTION
@@ -69,64 +76,33 @@ After training, you'll find:
   - Last model: `last.ckpt`
 - **Tokenizer**: `checkpoints/{model_name}/{model_name}_tokenizer.pt`
 
-### step 6. import load_model, load_tokenizer, and predict from inference.py 
+### step 7. import load_model, load_tokenizer, and predict from inference.py 
 ```python
 from inference import load_model, load_tokenizer, predict
 
-# access the checkpoint from the lstm_birnn after training a bi-lstm model
+# access the checkpoint from the checkpoints/lstm_birnn folder after training a bi-lstm model
 tokenizer, _ = load_tokenizer('checkpoints/lstm_birnn/lstm_birnn_tokenizer.pt')  # lstm_birnn or gru_birnn is the folder produced when checkpoints.zip is unzipped
 model = load_model('checkpoints/lstm_birnn/lstm_birnn-epoch=05-val_f1=0.9001.ckpt', 
                    model_type='birnn')
 
-# access the checkpoint from the gru_birnn after training a bi-gru model
+# access the checkpoint from the checkpoints/gru_birnn folder after training a bi-gru model
 tokenizer, tok_type = load_tokenizer('checkpoints/gru_birnn/gru_birnn_tokenizer.pt')
 model = load_model('checkpoints/gru_birnn/gru_birnn-epoch=02-val_f1=0.8968.ckpt',
                    model_type='birnn')
 ```
 
-### step 7. save the model specifications after running train.py
-for the google colab env
-```python
-import shutil
-from google.colab import files
-
-# Zip the checkpoints folder
-shutil.make_archive('checkpoints', 'zip', 'checkpoints')
-
-# Download the zipped file
-files.download('checkpoints.zip')
-```
-
+### step 7. locate the model and tokenizer after running train.py
 for your local/remote machine
-`
-#### After training, you'll find the model here...
+#### After training, you'll find the model was already saved here...
 `checkpoints/{model_name}/{model_name}-epoch={epoch}-val_f1={f1}.ckpt`
-#### and the tokenizer here...
+#### and the tokenizer was saved here...
 `checkpoints/{model_name}/{model_name}_tokenizer.pt`
-
-
-
 
 
 ## steps to run the trained model 
 ## 🛑 only run this code if you want to use the TRAINED model; othwerise go back to step 6 to load the latest model
 
-### step 1. install dependencies
-```bash
-pip install -r requirements.txt
-```
-### step 2. create virtual environment
-```bash
-# Using venv
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
-
-# Or using conda
-conda create -n url_classifier python=3.10 # if 3.10 doesn't work try 3.12
-conda activate url_classifier
-```
-
-### step 3. import load_model, load_tokenizer, and predict from inference.py
+### step 1. import load_model, load_tokenizer, and predict from inference.py
 ```python
 from inference import load_model, load_tokenizer, predict
 
