@@ -13,7 +13,7 @@ python -m venv venv
 source venv/bin/activate  # On Windows: venv\Scripts\activate
 
 # Or using conda
-conda create -n url_classifier python=3.10 # if 3.10 doesn't work try 3.12
+conda create -n url_classifier python=3.10
 conda activate url_classifier
 ```
 
